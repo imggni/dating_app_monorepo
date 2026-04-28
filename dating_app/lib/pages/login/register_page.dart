@@ -48,7 +48,8 @@ class RegisterPage extends GetView<RegisterController> {
                 () => SizedBox(
                   width: double.infinity,
                   child: FilledButton(
-                    onPressed: controller.loading.value ? null : controller.register,
+                    onPressed:
+                        controller.loading.value ? null : controller.register,
                     child: Text(controller.loading.value ? '提交中...' : '注册'),
                   ),
                 ),
