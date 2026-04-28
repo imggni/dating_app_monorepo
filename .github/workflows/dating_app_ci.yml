@@ -16,6 +16,8 @@ jobs:
     defaults:
       run:
         working-directory: dating_app
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - uses: actions/checkout@v4
@@ -24,6 +26,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
+          flutter-version: 3.29.3
           cache: true
 
       - name: Install dependencies
@@ -36,4 +39,9 @@ jobs:
         run: flutter analyze
 
       - name: Run tests
-        run: flutter test
+        run: |
+          if [ -d test ]; then
+            flutter test
+          else
+            echo "未找到 test 目录，跳过测试。"
+          fi
