@@ -31,14 +31,7 @@ jobs:
         run: flutter pub get
 
       - name: Create CI env file
-        run: |
-          if [ ! -f .env ]; then
-            cat > .env <<'EOF'
-            BASE_URL=
-            IM_SDK_APP_ID=
-            APP_NAME=
-            EOF
-          fi
+        run: touch .env && echo -e "BASE_URL=\nIM_SDK_APP_ID=\nAPP_NAME=" > .env
 
       - name: Format check
         run: dart format --output=none --set-exit-if-changed .
