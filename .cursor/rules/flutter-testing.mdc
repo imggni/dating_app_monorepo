@@ -1,0 +1,30 @@
+---
+description: Flutter 测试规范（unit/widget/integration/coverage）
+globs: dating_app/test/**,dating_app/integration_test/**,dating_app/**_test.dart
+alwaysApply: false
+---
+
+# Flutter 测试规范
+
+## 结构与范围（强制）
+
+- unit：`Controller/Service/Utils`（纯逻辑，不依赖 Flutter 渲染）
+- widget：关键组件/页面（交互、渲染、错误态、空态）
+- integration：关键业务路径（登录/鉴权、核心浏览/匹配/聊天等主流程）
+
+## Mock 与隔离（强制）
+
+- 外部依赖必须 mock：网络（Dio/Retrofit）、本地存储（Hive/secure storage）、时间/随机数
+- 测试中**禁止**硬编码 baseUrl/API Key/Token；需要时用配置注入或测试专用 override
+- 涉及中文提示/错误文案的断言，必须校验最终对用户展示的中文文案（避免直接断言内部异常字符串）
+
+## Golden（推荐）
+
+- 对高复用组件、主题/暗黑模式、关键页面状态（loading/empty/error）补充 golden
+- golden 必须固定字体/尺寸/locale，避免因环境差异导致不稳定
+
+## 覆盖率（最低门槛）
+
+- Controller/Service 覆盖率 ≥ 80%
+- Widget 覆盖率 ≥ 70%
+- 整体覆盖率 ≥ 60%

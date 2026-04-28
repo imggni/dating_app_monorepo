@@ -1,0 +1,19 @@
+---
+description: Flutter 网络与 Service 规范（Dio + Retrofit）
+globs: dating_app/lib/services/**/*.dart,dating_app/lib/api/**/*.dart
+alwaysApply: false
+---
+
+# Flutter 网络通信规范（Dio + Retrofit）
+
+## 强制约束
+
+- API Client 集中管理（单一 Dio 实例 + 拦截器），不要在各处 new Dio
+- Token 从 `flutter_secure_storage` 读取并注入请求头（例如 `Authorization: Bearer ...`）
+- 必须设置超时（connect/receive）
+- 统一错误映射：把 `DioException` 转成用户可读中文消息/业务异常
+- **禁止**硬编码 baseUrl：从环境变量/配置读取
+
+## 与后端契约对齐
+
+- 响应体必须按 `{ code, message, data }` 解析（不要假设裸数据）

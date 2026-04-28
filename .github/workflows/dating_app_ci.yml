@@ -1,0 +1,39 @@
+name: dating_app CI
+
+on:
+  push:
+    paths:
+      - "dating_app/**"
+      - ".github/workflows/dating_app_ci.yml"
+  pull_request:
+    paths:
+      - "dating_app/**"
+      - ".github/workflows/dating_app_ci.yml"
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: dating_app
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Format check
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Analyze code
+        run: flutter analyze
+
+      - name: Run tests
+        run: flutter test

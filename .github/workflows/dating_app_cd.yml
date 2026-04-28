@@ -1,0 +1,106 @@
+name: dating_app CD
+
+on:
+  push:
+    tags:
+      - "app-test-v*"
+      - "app-prod-v*"
+
+permissions:
+  contents: write
+
+jobs:
+  android-test:
+    if: startsWith(github.ref, 'refs/tags/app-test-v')
+    runs-on: ubuntu-latest
+    environment: test
+    defaults:
+      run:
+        working-directory: dating_app
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Create test env file
+        run: |
+          cat > .env <<'EOF'
+          BASE_URL=${{ secrets.APP_TEST_BASE_URL }}
+          EOF
+
+      - name: Build test Android APK
+        run: flutter build apk --release --flavor test
+
+      - name: Upload test APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-test-release-apk
+          path: dating_app/build/app/outputs/flutter-apk/app-test-release.apk
+
+      - name: Create GitHub prerelease
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dating_app/build/app/outputs/flutter-apk/app-test-release.apk
+          generate_release_notes: true
+          prerelease: true
+
+  android-prod:
+    if: startsWith(github.ref, 'refs/tags/app-prod-v')
+    runs-on: ubuntu-latest
+    environment: production
+    defaults:
+      run:
+        working-directory: dating_app
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Create production env file
+        run: |
+          cat > .env <<'EOF'
+          BASE_URL=${{ secrets.APP_PROD_BASE_URL }}
+          EOF
+
+      - name: Build production Android APK
+        run: flutter build apk --release --flavor prod
+
+      - name: Upload production APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-prod-release-apk
+          path: dating_app/build/app/outputs/flutter-apk/app-prod-release.apk
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dating_app/build/app/outputs/flutter-apk/app-prod-release.apk
+          generate_release_notes: true

@@ -1,0 +1,3816 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Dating App API",
+    "version": "1.0.0",
+    "description": "交友聊天应用后端API"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/api"
+    }
+  ],
+  "tags": [
+    {
+      "name": "User",
+      "description": "用户管理"
+    },
+    {
+      "name": "IM",
+      "description": "即时通讯"
+    },
+    {
+      "name": "Circle",
+      "description": "圈子动态"
+    },
+    {
+      "name": "Game",
+      "description": "游戏房间"
+    },
+    {
+      "name": "SlowChat",
+      "description": "慢速聊天"
+    },
+    {
+      "name": "Common",
+      "description": "通用功能"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "parameters": {
+      "PageQuery": {
+        "name": "page",
+        "in": "query",
+        "required": false,
+        "description": "页码，从 1 开始（默认 1）",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 1
+        },
+        "example": 1
+      },
+      "PageSizeQuery": {
+        "name": "pageSize",
+        "in": "query",
+        "required": false,
+        "description": "每页条数，范围 1-100（默认 10）",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 10
+        },
+        "example": 10
+      }
+    },
+    "schemas": {
+      "ApiResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "description": "业务状态码",
+            "example": 200
+          },
+          "message": {
+            "type": "string",
+            "description": "响应提示信息",
+            "example": "操作成功"
+          },
+          "data": {
+            "description": "响应数据（根据不同接口返回不同结构）"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "data"
+        ]
+      },
+      "PaginationMeta": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "description": "当前页码",
+            "example": 1
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "每页条数，最大 100",
+            "example": 10
+          },
+          "total": {
+            "type": "integer",
+            "description": "总记录数",
+            "example": 125
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "总页数",
+            "example": 13
+          }
+        },
+        "required": [
+          "page",
+          "pageSize",
+          "total",
+          "totalPages"
+        ]
+      },
+      "UserRegisterRequest": {
+        "type": "object",
+        "properties": {
+          "phone": {
+            "type": "string",
+            "description": "手机号（大陆 11 位）",
+            "example": "13800138000"
+          },
+          "password": {
+            "type": "string",
+            "description": "密码（6-20位）",
+            "example": "123456"
+          },
+          "nickname": {
+            "type": "string",
+            "description": "昵称（1-50位）",
+            "example": "小明"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "male",
+              "female",
+              "other"
+            ],
+            "description": "性别",
+            "example": "male"
+          },
+          "age": {
+            "type": "integer",
+            "description": "年龄（1-150）",
+            "example": 25
+          }
+        },
+        "required": [
+          "phone",
+          "password",
+          "nickname"
+        ]
+      },
+      "UserLoginRequest": {
+        "type": "object",
+        "properties": {
+          "phone": {
+            "type": "string",
+            "description": "手机号",
+            "example": "13800138000"
+          },
+          "password": {
+            "type": "string",
+            "description": "密码",
+            "example": "123456"
+          }
+        },
+        "required": [
+          "phone",
+          "password"
+        ]
+      },
+      "UserUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "nickname": {
+            "type": "string",
+            "description": "昵称（1-50位）",
+            "example": "小明"
+          },
+          "avatar": {
+            "type": "string",
+            "description": "头像URL",
+            "example": "https://example.com/avatar.png"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "male",
+              "female",
+              "other"
+            ],
+            "description": "性别"
+          },
+          "age": {
+            "type": "integer",
+            "description": "年龄（1-150）",
+            "example": 25
+          },
+          "bio": {
+            "type": "string",
+            "description": "个人简介（最多200字）",
+            "example": "热爱生活，喜欢交友"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "标签数组",
+            "example": [
+              "运动",
+              "音乐"
+            ]
+          }
+        }
+      },
+      "UserProfile": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "用户ID"
+          },
+          "phone": {
+            "type": "string",
+            "description": "手机号"
+          },
+          "nickname": {
+            "type": "string",
+            "description": "昵称"
+          },
+          "avatar": {
+            "type": "string",
+            "nullable": true,
+            "description": "头像URL"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "male",
+              "female",
+              "other"
+            ],
+            "nullable": true,
+            "description": "性别"
+          },
+          "age": {
+            "type": "integer",
+            "nullable": true,
+            "description": "年龄"
+          },
+          "bio": {
+            "type": "string",
+            "nullable": true,
+            "description": "个人简介"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "description": "标签数组"
+          },
+          "isAnonymous": {
+            "type": "boolean",
+            "description": "是否匿名",
+            "example": false
+          },
+          "onlineStatus": {
+            "type": "boolean",
+            "description": "在线状态",
+            "example": true
+          },
+          "gameScore": {
+            "type": "integer",
+            "description": "游戏分数",
+            "example": 100
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "注册时间"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "更新时间"
+          }
+        },
+        "required": [
+          "id",
+          "phone",
+          "nickname",
+          "isAnonymous",
+          "onlineStatus",
+          "gameScore",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "UserLoginData": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/UserProfile"
+          },
+          "token": {
+            "type": "string",
+            "description": "JWT访问令牌"
+          },
+          "refreshToken": {
+            "type": "string",
+            "description": "刷新令牌"
+          }
+        },
+        "required": [
+          "user",
+          "token",
+          "refreshToken"
+        ]
+      },
+      "FriendRequest": {
+        "type": "object",
+        "properties": {
+          "friendId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "好友ID"
+          },
+          "message": {
+            "type": "string",
+            "description": "申请消息",
+            "example": "我想加你为好友"
+          }
+        },
+        "required": [
+          "friendId"
+        ]
+      },
+      "FriendHandleRequest": {
+        "type": "object",
+        "properties": {
+          "requestId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "申请ID"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "accept",
+              "reject"
+            ],
+            "description": "操作：accept接受，reject拒绝"
+          }
+        },
+        "required": [
+          "requestId",
+          "action"
+        ]
+      },
+      "FriendRelation": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "关系ID"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "用户ID"
+          },
+          "friendId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "好友ID"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "accepted",
+              "rejected"
+            ],
+            "description": "状态：pending待处理，accepted已接受，rejected已拒绝"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "创建时间"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "更新时间"
+          },
+          "friend": {
+            "$ref": "#/components/schemas/UserProfile"
+          }
+        },
+        "required": [
+          "id",
+          "userId",
+          "friendId",
+          "status",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "ImSendRequest": {
+        "type": "object",
+        "properties": {
+          "receiverId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "接收者ID"
+          },
+          "content": {
+            "type": "string",
+            "description": "消息内容"
+          },
+          "messageType": {
+            "type": "string",
+            "enum": [
+              "text",
+              "image",
+              "voice",
+              "video"
+            ],
+            "description": "消息类型",
+            "example": "text"
+          }
+        },
+        "required": [
+          "receiverId",
+          "content"
+        ]
+      },
+      "ImMessage": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "消息ID"
+          },
+          "senderId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "发送者ID"
+          },
+          "receiverId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "接收者ID"
+          },
+          "groupId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true,
+            "description": "群组ID"
+          },
+          "messageType": {
+            "type": "string",
+            "enum": [
+              "text",
+              "image",
+              "voice",
+              "video"
+            ],
+            "description": "消息类型"
+          },
+          "content": {
+            "type": "string",
+            "description": "消息内容"
+          },
+          "isRead": {
+            "type": "boolean",
+            "description": "是否已读"
+          },
+          "isRecalled": {
+            "type": "boolean",
+            "description": "是否已撤回"
+          },
+          "sendTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "发送时间"
+          },
+          "sender": {
+            "$ref": "#/components/schemas/UserProfile"
+          }
+        },
+        "required": [
+          "id",
+          "senderId",
+          "receiverId",
+          "messageType",
+          "content",
+          "isRead",
+          "isRecalled",
+          "sendTime"
+        ]
+      },
+      "ImGroupCreateRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "群组名称"
+          },
+          "memberIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "成员ID列表"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "ImGroup": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "群组ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "群组名称"
+          },
+          "creatorId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "创建者ID"
+          },
+          "memberCount": {
+            "type": "integer",
+            "description": "成员数量"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "创建时间"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "更新时间"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "creatorId",
+          "memberCount",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "ImConversation": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "会话ID"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "private",
+              "group"
+            ],
+            "description": "会话类型"
+          },
+          "lastMessage": {
+            "$ref": "#/components/schemas/ImMessage",
+            "nullable": true
+          },
+          "unreadCount": {
+            "type": "integer",
+            "description": "未读消息数"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "最后更新时间"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "unreadCount",
+          "updatedAt"
+        ]
+      },
+      "Circle": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "圈子ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "圈子名称"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "圈子描述"
+          },
+          "coverImage": {
+            "type": "string",
+            "nullable": true,
+            "description": "封面图片URL"
+          },
+          "memberCount": {
+            "type": "integer",
+            "description": "成员数量"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "创建时间"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "更新时间"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "memberCount",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CirclePostCreateRequest": {
+        "type": "object",
+        "properties": {
+          "circleId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "圈子ID"
+          },
+          "content": {
+            "type": "string",
+            "description": "帖子内容"
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "图片URL数组",
+            "maxItems": 9
+          }
+        },
+        "required": [
+          "circleId",
+          "content"
+        ]
+      },
+      "CirclePost": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "帖子ID"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "用户ID"
+          },
+          "circleId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "圈子ID"
+          },
+          "content": {
+            "type": "string",
+            "description": "帖子内容"
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "description": "图片URL数组"
+          },
+          "likes": {
+            "type": "integer",
+            "description": "点赞数"
+          },
+          "comments": {
+            "type": "integer",
+            "description": "评论数"
+          },
+          "isTop": {
+            "type": "boolean",
+            "description": "是否置顶"
+          },
+          "isDeleted": {
+            "type": "boolean",
+            "description": "是否已删除"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "创建时间"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "更新时间"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserProfile"
+          },
+          "circle": {
+            "$ref": "#/components/schemas/Circle"
+          }
+        },
+        "required": [
+          "id",
+          "userId",
+          "circleId",
+          "content",
+          "likes",
+          "comments",
+          "isTop",
+          "isDeleted",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CircleCommentCreateRequest": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "description": "评论内容"
+          }
+        },
+        "required": [
+          "content"
+        ]
+      },
+      "CircleComment": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "评论ID"
+          },
+          "postId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "帖子ID"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "用户ID"
+          },
+          "content": {
+            "type": "string",
+            "description": "评论内容"
+          },
+          "parentId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true,
+            "description": "父评论ID"
+          },
+          "likes": {
+            "type": "integer",
+            "description": "点赞数"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "创建时间"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "更新时间"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserProfile"
+          }
+        },
+        "required": [
+          "id",
+          "postId",
+          "userId",
+          "content",
+          "likes",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "GameRoomCreateRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "房间名称"
+          },
+          "maxPlayers": {
+            "type": "integer",
+            "description": "最大玩家数（2-10）",
+            "minimum": 2,
+            "maximum": 10,
+            "example": 4
+          },
+          "gameType": {
+            "type": "string",
+            "description": "游戏类型",
+            "example": "draw_guess"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "GameRoom": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "房间ID"
+          },
+          "roomName": {
+            "type": "string",
+            "description": "房间名称"
+          },
+          "roomCode": {
+            "type": "string",
+            "description": "房间代码"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "waiting",
+              "playing",
+              "finished"
+            ],
+            "description": "房间状态"
+          },
+          "hostId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "房主ID"
+          },
+          "maxPlayers": {
+            "type": "integer",
+            "description": "最大玩家数"
+          },
+          "currentPlayers": {
+            "type": "integer",
+            "description": "当前玩家数"
+          },
+          "gameRound": {
+            "type": "integer",
+            "description": "当前回合"
+          },
+          "roundTime": {
+            "type": "integer",
+            "description": "每回合时间（秒）"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "创建时间"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "更新时间"
+          },
+          "endedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "结束时间"
+          }
+        },
+        "required": [
+          "id",
+          "roomName",
+          "roomCode",
+          "status",
+          "hostId",
+          "maxPlayers",
+          "currentPlayers",
+          "gameRound",
+          "roundTime",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "GameRoomMember": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "成员ID"
+          },
+          "roomId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "房间ID"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "用户ID"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "host",
+              "player"
+            ],
+            "description": "角色"
+          },
+          "score": {
+            "type": "integer",
+            "description": "分数"
+          },
+          "joinTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "加入时间"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserProfile"
+          }
+        },
+        "required": [
+          "id",
+          "roomId",
+          "userId",
+          "role",
+          "score",
+          "joinTime"
+        ]
+      },
+      "BrushSyncRequest": {
+        "type": "object",
+        "properties": {
+          "roomId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "房间ID"
+          },
+          "round": {
+            "type": "integer",
+            "description": "回合数",
+            "minimum": 1
+          },
+          "content": {
+            "description": "画笔数据"
+          }
+        },
+        "required": [
+          "roomId",
+          "content"
+        ]
+      },
+      "SlowChatSendRequest": {
+        "type": "object",
+        "properties": {
+          "receiverId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "接收者ID"
+          },
+          "content": {
+            "type": "string",
+            "description": "消息内容"
+          },
+          "messageType": {
+            "type": "string",
+            "enum": [
+              "text",
+              "image",
+              "voice",
+              "video"
+            ],
+            "description": "消息类型",
+            "example": "text"
+          },
+          "delayTime": {
+            "type": "integer",
+            "description": "延迟时间（分钟）",
+            "minimum": 0,
+            "example": 60
+          },
+          "isAnonymous": {
+            "type": "boolean",
+            "description": "是否匿名",
+            "example": false
+          }
+        },
+        "required": [
+          "receiverId",
+          "content"
+        ]
+      },
+      "SlowChat": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "消息ID"
+          },
+          "senderId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "发送者ID"
+          },
+          "receiverId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "接收者ID"
+          },
+          "title": {
+            "type": "string",
+            "description": "消息标题"
+          },
+          "content": {
+            "type": "string",
+            "description": "消息内容"
+          },
+          "messageType": {
+            "type": "string",
+            "enum": [
+              "text",
+              "image",
+              "voice",
+              "video"
+            ],
+            "description": "消息类型"
+          },
+          "delayTime": {
+            "type": "integer",
+            "description": "延迟时间（分钟）"
+          },
+          "sendTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "发送时间"
+          },
+          "actualSendTime": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "实际发送时间"
+          },
+          "isOpened": {
+            "type": "boolean",
+            "description": "是否已打开"
+          },
+          "isAnonymous": {
+            "type": "boolean",
+            "description": "是否匿名"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "创建时间"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "更新时间"
+          },
+          "sender": {
+            "$ref": "#/components/schemas/UserProfile"
+          },
+          "receiver": {
+            "$ref": "#/components/schemas/UserProfile"
+          }
+        },
+        "required": [
+          "id",
+          "senderId",
+          "receiverId",
+          "title",
+          "content",
+          "messageType",
+          "delayTime",
+          "sendTime",
+          "isOpened",
+          "isAnonymous",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "TokenRefreshRequest": {
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string",
+            "description": "刷新令牌"
+          }
+        },
+        "required": [
+          "refreshToken"
+        ]
+      },
+      "SensitiveFilterRequest": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "description": "待过滤内容"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "text",
+              "image"
+            ],
+            "description": "内容类型",
+            "example": "text"
+          }
+        },
+        "required": [
+          "content"
+        ]
+      },
+      "Region": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "地区代码"
+          },
+          "name": {
+            "type": "string",
+            "description": "地区名称"
+          },
+          "level": {
+            "type": "integer",
+            "description": "级别：1省/直辖市，2市，3区/县"
+          },
+          "parentCode": {
+            "type": "string",
+            "nullable": true,
+            "description": "父级代码"
+          }
+        },
+        "required": [
+          "code",
+          "name",
+          "level"
+        ]
+      },
+      "OssToken": {
+        "type": "object",
+        "properties": {
+          "accessKeyId": {
+            "type": "string",
+            "description": "AccessKey ID"
+          },
+          "accessKeySecret": {
+            "type": "string",
+            "description": "AccessKey Secret"
+          },
+          "securityToken": {
+            "type": "string",
+            "description": "Security Token"
+          },
+          "expiration": {
+            "type": "string",
+            "format": "date-time",
+            "description": "过期时间"
+          },
+          "bucket": {
+            "type": "string",
+            "description": "存储桶名称"
+          },
+          "region": {
+            "type": "string",
+            "description": "地区"
+          },
+          "endpoint": {
+            "type": "string",
+            "description": "端点"
+          }
+        },
+        "required": [
+          "accessKeyId",
+          "accessKeySecret",
+          "securityToken",
+          "expiration",
+          "bucket",
+          "region",
+          "endpoint"
+        ]
+      },
+      "UserPageData": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserProfile"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PaginationMeta"
+          }
+        },
+        "required": [
+          "items",
+          "pagination"
+        ]
+      },
+      "ImMessagePageData": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ImMessage"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PaginationMeta"
+          }
+        },
+        "required": [
+          "items",
+          "pagination"
+        ]
+      },
+      "CirclePostPageData": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CirclePost"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PaginationMeta"
+          }
+        },
+        "required": [
+          "items",
+          "pagination"
+        ]
+      },
+      "CircleCommentPageData": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CircleComment"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PaginationMeta"
+          }
+        },
+        "required": [
+          "items",
+          "pagination"
+        ]
+      },
+      "GameRoomPageData": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GameRoom"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PaginationMeta"
+          }
+        },
+        "required": [
+          "items",
+          "pagination"
+        ]
+      },
+      "SlowChatPageData": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SlowChat"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PaginationMeta"
+          }
+        },
+        "required": [
+          "items",
+          "pagination"
+        ]
+      }
+    }
+  },
+  "paths": {
+    "/user/register": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "summary": "用户注册",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserRegisterRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "注册成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/UserLoginData"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/login": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "summary": "用户登录",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserLoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "登录成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/UserLoginData"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/profile": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "获取个人资料",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/UserProfile"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "User"
+        ],
+        "summary": "更新个人资料",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/friend/request": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "summary": "发送好友申请",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FriendRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/friend/handle": {
+      "put": {
+        "tags": [
+          "User"
+        ],
+        "summary": "处理好友申请",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FriendHandleRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/friend/list": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "获取好友列表",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/FriendRelation"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/logout": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "summary": "用户登出",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/online/{userId}": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "获取用户在线状态",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "用户ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "online": {
+                              "type": "boolean"
+                            },
+                            "lastSeenAt": {
+                              "type": "string",
+                              "format": "date-time",
+                              "nullable": true
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/im/messages": {
+      "get": {
+        "tags": [
+          "IM"
+        ],
+        "summary": "获取消息列表",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PageQuery"
+          },
+          {
+            "$ref": "#/components/parameters/PageSizeQuery"
+          },
+          {
+            "name": "friendId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "好友ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/ImMessagePageData"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/im/group/create": {
+      "post": {
+        "tags": [
+          "IM"
+        ],
+        "summary": "创建群组",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImGroupCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/ImGroup"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/im/group/member/add": {
+      "put": {
+        "tags": [
+          "IM"
+        ],
+        "summary": "添加群成员",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "groupId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "群组ID"
+                  },
+                  "memberId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "成员ID"
+                  }
+                },
+                "required": [
+                  "groupId",
+                  "memberId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/im/send": {
+      "post": {
+        "tags": [
+          "IM"
+        ],
+        "summary": "发送消息",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImSendRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/ImMessage"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/im/conversations": {
+      "get": {
+        "tags": [
+          "IM"
+        ],
+        "summary": "获取会话列表",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/ImConversation"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/im/messages/{messageId}/read": {
+      "put": {
+        "tags": [
+          "IM"
+        ],
+        "summary": "标记消息为已读",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "messageId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "消息ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/im/messages/{messageId}/recall": {
+      "put": {
+        "tags": [
+          "IM"
+        ],
+        "summary": "撤回消息",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "messageId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "消息ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/im/unread/count": {
+      "get": {
+        "tags": [
+          "IM"
+        ],
+        "summary": "获取未读消息数量",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "total": {
+                              "type": "integer"
+                            },
+                            "byFriendId": {
+                              "type": "object",
+                              "additionalProperties": {
+                                "type": "integer"
+                              }
+                            },
+                            "byGroupId": {
+                              "type": "object",
+                              "additionalProperties": {
+                                "type": "integer"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/im/group/{groupId}/messages": {
+      "get": {
+        "tags": [
+          "IM"
+        ],
+        "summary": "获取群消息",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "群组ID"
+          },
+          {
+            "$ref": "#/components/parameters/PageQuery"
+          },
+          {
+            "$ref": "#/components/parameters/PageSizeQuery"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/ImMessagePageData"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/im/group/{groupId}/send": {
+      "post": {
+        "tags": [
+          "IM"
+        ],
+        "summary": "发送群消息",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "群组ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "content": {
+                    "type": "string",
+                    "description": "消息内容"
+                  },
+                  "messageType": {
+                    "type": "string",
+                    "enum": [
+                      "text",
+                      "image",
+                      "voice",
+                      "video"
+                    ],
+                    "description": "消息类型",
+                    "example": "text"
+                  }
+                },
+                "required": [
+                  "content"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/ImMessage"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/circle/list": {
+      "get": {
+        "tags": [
+          "Circle"
+        ],
+        "summary": "获取圈子列表",
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Circle"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/circle/posts": {
+      "get": {
+        "tags": [
+          "Circle"
+        ],
+        "summary": "获取帖子列表",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PageQuery"
+          },
+          {
+            "$ref": "#/components/parameters/PageSizeQuery"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/CirclePostPageData"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Circle"
+        ],
+        "summary": "发布帖子",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CirclePostCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/CirclePost"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/circle/posts/{postId}": {
+      "get": {
+        "tags": [
+          "Circle"
+        ],
+        "summary": "获取帖子详情",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "帖子ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/CirclePost"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Circle"
+        ],
+        "summary": "删除帖子",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "帖子ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/circle/posts/{postId}/like": {
+      "post": {
+        "tags": [
+          "Circle"
+        ],
+        "summary": "点赞帖子",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "帖子ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/circle/posts/{postId}/unlike": {
+      "post": {
+        "tags": [
+          "Circle"
+        ],
+        "summary": "取消点赞帖子",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "帖子ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/circle/posts/{postId}/comments": {
+      "get": {
+        "tags": [
+          "Circle"
+        ],
+        "summary": "获取帖子评论",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "帖子ID"
+          },
+          {
+            "$ref": "#/components/parameters/PageQuery"
+          },
+          {
+            "$ref": "#/components/parameters/PageSizeQuery"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/CircleCommentPageData"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Circle"
+        ],
+        "summary": "评论帖子",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "帖子ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CircleCommentCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/CircleComment"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/circle/comment/like": {
+      "post": {
+        "tags": [
+          "Circle"
+        ],
+        "summary": "点赞评论",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "commentId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "评论ID"
+                  }
+                },
+                "required": [
+                  "commentId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/game/rooms": {
+      "get": {
+        "tags": [
+          "Game"
+        ],
+        "summary": "获取游戏房间列表",
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/GameRoomPageData"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Game"
+        ],
+        "summary": "创建游戏房间",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GameRoomCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/GameRoom"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/game/rooms/{roomId}": {
+      "get": {
+        "tags": [
+          "Game"
+        ],
+        "summary": "获取房间详情",
+        "parameters": [
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "房间ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/GameRoom"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/game/rooms/{roomId}/join": {
+      "post": {
+        "tags": [
+          "Game"
+        ],
+        "summary": "加入游戏房间",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "房间ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/game/rooms/{roomId}/leave": {
+      "post": {
+        "tags": [
+          "Game"
+        ],
+        "summary": "离开游戏房间",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "房间ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/game/rooms/{roomId}/start": {
+      "post": {
+        "tags": [
+          "Game"
+        ],
+        "summary": "开始游戏",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "房间ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/game/brush/sync": {
+      "post": {
+        "tags": [
+          "Game"
+        ],
+        "summary": "同步画笔数据",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BrushSyncRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/game/rooms/{roomId}/round/start": {
+      "put": {
+        "tags": [
+          "Game"
+        ],
+        "summary": "开始新回合",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "房间ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/game/rooms/{roomId}/round/end": {
+      "put": {
+        "tags": [
+          "Game"
+        ],
+        "summary": "结束当前回合",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "房间ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/game/rooms/{roomId}/destroy": {
+      "delete": {
+        "tags": [
+          "Game"
+        ],
+        "summary": "销毁游戏房间",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "房间ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/slow-chat/rooms": {
+      "get": {
+        "tags": [
+          "SlowChat"
+        ],
+        "summary": "获取慢速聊天房间列表",
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "roomName": {
+                                "type": "string"
+                              },
+                              "memberCount": {
+                                "type": "integer"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "SlowChat"
+        ],
+        "summary": "创建慢速聊天房间",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "format": "uuid"
+                            },
+                            "roomName": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/slow-chat/rooms/{roomId}": {
+      "get": {
+        "tags": [
+          "SlowChat"
+        ],
+        "summary": "获取房间详情",
+        "parameters": [
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "房间ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "format": "uuid"
+                            },
+                            "roomName": {
+                              "type": "string"
+                            },
+                            "messages": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/components/schemas/SlowChat"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/slow-chat/rooms/{roomId}/join": {
+      "post": {
+        "tags": [
+          "SlowChat"
+        ],
+        "summary": "加入慢速聊天房间",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "房间ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/slow-chat/rooms/{roomId}/leave": {
+      "post": {
+        "tags": [
+          "SlowChat"
+        ],
+        "summary": "离开慢速聊天房间",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "房间ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/slow-chat/rooms/{roomId}/messages": {
+      "get": {
+        "tags": [
+          "SlowChat"
+        ],
+        "summary": "获取房间消息",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "房间ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/SlowChatPageData"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/slow-chat/send": {
+      "post": {
+        "tags": [
+          "SlowChat"
+        ],
+        "summary": "发送慢速消息",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SlowChatSendRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/SlowChat"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/slow-chat/messages/{messageId}/open": {
+      "put": {
+        "tags": [
+          "SlowChat"
+        ],
+        "summary": "打开慢速消息",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "messageId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "消息ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/SlowChat"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/slow-chat/messages/{messageId}": {
+      "delete": {
+        "tags": [
+          "SlowChat"
+        ],
+        "summary": "删除慢速消息",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "messageId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "消息ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/slow-chat/messages/{messageId}/anonymous": {
+      "put": {
+        "tags": [
+          "SlowChat"
+        ],
+        "summary": "设置消息匿名",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "messageId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "消息ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/common/upload": {
+      "post": {
+        "tags": [
+          "Common"
+        ],
+        "summary": "文件上传",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "上传文件"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "type": "string",
+                              "description": "文件URL"
+                            },
+                            "filename": {
+                              "type": "string",
+                              "description": "文件名"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/common/token/refresh": {
+      "post": {
+        "tags": [
+          "Common"
+        ],
+        "summary": "刷新访问令牌",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenRefreshRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "token": {
+                              "type": "string",
+                              "description": "新访问令牌"
+                            },
+                            "refreshToken": {
+                              "type": "string",
+                              "description": "新刷新令牌"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/common/sensitive/filter": {
+      "post": {
+        "tags": [
+          "Common"
+        ],
+        "summary": "敏感内容过滤",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SensitiveFilterRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "filtered": {
+                              "type": "boolean",
+                              "description": "是否包含敏感内容"
+                            },
+                            "content": {
+                              "type": "string",
+                              "description": "过滤后的内容"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/common/regions": {
+      "get": {
+        "tags": [
+          "Common"
+        ],
+        "summary": "获取地区列表",
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Region"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/common/regions/{code}": {
+      "get": {
+        "tags": [
+          "Common"
+        ],
+        "summary": "获取地区详情",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "地区代码"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/Region"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/common/dictionaries": {
+      "get": {
+        "tags": [
+          "Common"
+        ],
+        "summary": "获取字典数据",
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "key": {
+                                  "type": "string"
+                                },
+                                "value": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/common/configs": {
+      "get": {
+        "tags": [
+          "Common"
+        ],
+        "summary": "获取系统配置",
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "additionalProperties": true,
+                          "description": "配置对象"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/common/oss/token": {
+      "get": {
+        "tags": [
+          "Common"
+        ],
+        "summary": "获取OSS上传令牌",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/OssToken"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

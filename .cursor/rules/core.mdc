@@ -1,0 +1,37 @@
+---
+description: dating_app_monorepo 全局开发规范
+alwaysApply: true
+---
+
+# dating_app_monorepo 全局规范
+
+## 技术栈与目录（Mono-repo）
+
+- 前端：Flutter（`dating_app/`）
+- 后端：Express + TypeScript + Prisma（`dating_app_api/`）
+- 文档：`docs/`
+
+## 语言约定（强制）
+
+- **UI 文案/错误提示**：中文
+- **代码注释/类型/文档**：英文
+
+## 配置与安全（强制）
+
+- 所有配置来自环境变量（`.env`），**禁止硬编码**域名、API Key、Secret、Token、密码等
+- 处理任何用户输入前必须校验；敏感信息不得出现在日志/响应中
+
+## 类型与命名（强制）
+
+- 严格类型：禁止滥用 TypeScript `any`、Dart `dynamic`
+- 命名：变量/函数 `camelCase`；类型/类 `PascalCase`；避免无意义命名（`a`/`temp`/`data`）
+
+## 前后端契约（强制）
+
+- REST 路径：小写 + 连字符（例如 `/api/user-profiles`）
+- 统一响应体：`{ code: number, message: string, data: any }`
+- 统一错误码：200 / 400 / 401 / 403 / 404 / 409 / 500
+
+## 第三方文档（强制）
+
+- 任何第三方库/SDK 相关实现，优先对照**最新官方文档**，避免过时/幻觉 API  

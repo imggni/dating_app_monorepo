@@ -1,0 +1,18 @@
+---
+description: 后端错误处理与异常（AppError + 全局 errorHandler）
+globs: dating_app_api/src/**/*.ts
+alwaysApply: false
+---
+
+# 错误处理与异常规范（强制）
+
+## 统一原则
+
+- 任何异常都必须被捕获并映射为统一响应 `{ code, message, data }`
+- message 面向用户可读；不要泄露敏感信息/内部实现细节
+
+## 推荐模式
+
+- 定义 `AppError` 及子类（Validation/Unauthorized/Forbidden/NotFound/Conflict/Internal）
+- 全局 `errorHandler` 中间件统一输出
+- 异步 route 用 `asyncHandler` 包装，避免遗漏 try/catch

@@ -1,0 +1,23 @@
+---
+description: Prisma/数据库规范（schema/迁移/repository）
+globs: dating_app_api/prisma/schema.prisma,dating_app_api/src/repositories/**/*.ts,dating_app_api/src/models/**/*.ts
+alwaysApply: false
+---
+
+# Prisma 与数据库规范
+
+## 基本原则（强制）
+
+- 数据访问统一用 Prisma；避免/禁止裸 SQL（除非充分论证）
+- 所有 schema 变更必须走迁移（migrate）
+
+## Schema 约定
+
+- Model：`PascalCase`；字段：`camelCase`
+- 关键字段：`id` / `createdAt` / `updatedAt`（`@updatedAt`）/ 可选 `isDeleted`
+
+## Repository（强制）
+
+- 禁止无 where 的全表 updateMany/deleteMany
+- 避免 N+1：用 `include/select`
+- 返回前过滤敏感字段（如 `passwordHash`）

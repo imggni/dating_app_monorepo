@@ -1,0 +1,41 @@
+{
+  "version": "2.0",
+  "envId": "{{env.ENV_ID}}",
+  "framework": {
+    "name": "dating-app-monorepo",
+    "plugins": {
+      "api": {
+        "use": "@cloudbase/framework-plugin-container",
+        "inputs": {
+          "serviceName": "{{env.CLOUDBASE_SERVICE_NAME}}",
+          "servicePath": "/",
+          "localPath": "./dating_app_api",
+          "dockerfilePath": "./dating_app_api/Dockerfile",
+          "containerPort": 3000,
+          "envVariables": {
+            "PORT": "3000",
+            "NODE_ENV": "{{env.NODE_ENV}}",
+            "JWT_SECRET": "{{env.JWT_SECRET}}",
+            "DATABASE_URL": "{{env.DATABASE_URL}}",
+
+            "CORS_ENABLED": "{{env.CORS_ENABLED}}",
+            "ALLOWED_ORIGINS": "{{env.ALLOWED_ORIGINS}}",
+
+            "UPSTASH_REDIS_REST_URL": "{{env.UPSTASH_REDIS_REST_URL}}",
+            "UPSTASH_REDIS_REST_TOKEN": "{{env.UPSTASH_REDIS_REST_TOKEN}}",
+
+            "CLOUDBASE_ENV_ID": "{{env.ENV_ID}}",
+            "CLOUDBASE_STORAGE_URL": "{{env.CLOUDBASE_STORAGE_URL}}",
+
+            "TENCENT_IM_SDK_APP_ID": "{{env.TENCENT_IM_SDK_APP_ID}}",
+            "TENCENT_IM_SECRET": "{{env.TENCENT_IM_SECRET}}",
+
+            "JPUSH_APP_KEY": "{{env.JPUSH_APP_KEY}}",
+            "JPUSH_MASTER_SECRET": "{{env.JPUSH_MASTER_SECRET}}"
+          }
+        }
+      }
+    }
+  }
+}
+

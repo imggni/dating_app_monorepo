@@ -1,0 +1,17 @@
+{
+  "disabledSkills": [
+    "git-commit",
+    "app-compliance-deploy",
+    "nestjs-backend-specs"
+  ],
+  "enabledSkills": [
+    "orchestrator",
+    "flutter-dev-specs",
+    "express-backend-specs",
+    "code-reviewer",
+    "feature-developer",
+    "bug-fixer",
+    "tech-lead",
+    "qa-engineer"
+  ]
+}

@@ -1,0 +1,18 @@
+---
+description: Flutter Widget 组件规范（可复用/性能）
+globs: dating_app/lib/widgets/**/*.dart,dating_app/lib/views/**/widgets/**/*.dart
+alwaysApply: false
+---
+
+# Flutter Widget 与组件规范
+
+## 组件设计
+
+- 可复用组件放 `lib/widgets/**`；页面私有组件放 `lib/views/**/widgets/**`
+- 组件命名：`PascalCase`；文件：`snake_case.dart`
+- 优先 `StatelessWidget` + GetX 状态（避免滥用 `StatefulWidget`）
+
+## 性能（强制偏好）
+
+- 尽可能使用 `const` 构造
+- 避免在 `Obx` 中包裹巨大子树；只让必要部分响应式重建

@@ -1,0 +1,21 @@
+---
+description: 后端 API 契约（响应体/路由风格/分页）
+globs: dating_app_api/src/routes/**/*.ts,dating_app_api/src/schemas/**/*.ts
+alwaysApply: false
+---
+
+# API 契约与响应格式（强制）
+
+## 统一响应体（必须）
+
+- 成功：`{ code: 200, message: string, data: T }`
+- 失败：`{ code: <httpStatus>, message: string, data: null }`
+
+## REST 路由（必须）
+
+- `/api/` 前缀；路径小写 + 连字符；资源名用复数（`/users`）
+- 分页列表返回：`data: { items, total, page, pageSize }`
+
+## Schema（推荐）
+
+- 请求/响应 Schema 分离（响应不得包含 `passwordHash` 等敏感字段）

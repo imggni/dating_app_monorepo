@@ -1,0 +1,23 @@
+---
+description: Flutter 分层与项目结构（GetX）
+globs: dating_app/lib/**/*.dart
+alwaysApply: false
+---
+
+# Flutter 架构分层（GetX，强制）
+
+## 分层（单向依赖）
+
+- View（页面/UI）→ Controller（状态/交互）→ Service（数据/业务）→ Model（纯数据）
+
+## 强制约束
+
+- View **不**允许直接调 API / 写业务逻辑
+- Controller 负责状态与用户交互，异步必须 try/catch + loading/error/empty 状态
+- Service 负责数据获取、缓存、第三方调用；不要把 UI 逻辑塞进 Service
+- Model 只做数据容器（序列化/反序列化），不混入 GetX 状态
+
+## 命名与文件
+
+- 文件：`snake_case.dart`（`home_page.dart`, `user_service.dart`）
+- 类：`PascalCase`；方法/变量：`camelCase`

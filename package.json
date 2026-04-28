@@ -1,0 +1,24 @@
+{
+  "name": "dating_app_monorepo",
+  "private": true,
+  "scripts": {
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.0"
+  },
+  "lint-staged": {
+    "dating_app_api/**/*.{js,ts,tsx}": [
+      "./dating_app_api/node_modules/.bin/prettier --write",
+      "./dating_app_api/node_modules/.bin/eslint --max-warnings=0 --fix"
+    ],
+    "dating_app_api/**/*.{json,md,yml,yaml}": [
+      "./dating_app_api/node_modules/.bin/prettier --write"
+    ],
+    "dating_app/**/*.dart": [
+      "dart format"
+    ]
+  }
+}
+

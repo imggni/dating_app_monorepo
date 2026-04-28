@@ -1,0 +1,117 @@
+name: dating_app_api CD (CloudBase)
+
+on:
+  push:
+    tags:
+      - "api-test-v*"
+      - "api-prod-v*"
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-test:
+    if: startsWith(github.ref, 'refs/tags/api-test-v')
+    runs-on: ubuntu-latest
+    environment: test
+
+    env:
+      ENV_ID: ${{ secrets.CLOUDBASE_ENV_ID }}
+      CLOUDBASE_SERVICE_NAME: dating-app-api-test
+      NODE_ENV: production
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      DATABASE_URL: ${{ secrets.API_TEST_DATABASE_URL }}
+      CORS_ENABLED: ${{ secrets.CORS_ENABLED }}
+      ALLOWED_ORIGINS: ${{ secrets.ALLOWED_ORIGINS }}
+      UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+      UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
+      CLOUDBASE_STORAGE_URL: ${{ secrets.CLOUDBASE_STORAGE_URL }}
+      TENCENT_IM_SDK_APP_ID: ${{ secrets.TENCENT_IM_SDK_APP_ID }}
+      TENCENT_IM_SECRET: ${{ secrets.TENCENT_IM_SECRET }}
+      JPUSH_APP_KEY: ${{ secrets.JPUSH_APP_KEY }}
+      JPUSH_MASTER_SECRET: ${{ secrets.JPUSH_MASTER_SECRET }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: ./dating_app_api
+
+      - name: Prisma generate
+        run: pnpm prisma generate
+        working-directory: ./dating_app_api
+
+      - name: Prisma migrate deploy
+        run: pnpm prisma migrate deploy
+        working-directory: ./dating_app_api
+
+      - name: Deploy test to CloudBase
+        uses: TencentCloudBase/cloudbase-action@v2.0.1
+        with:
+          secretId: ${{ secrets.TC_SECRET_ID }}
+          secretKey: ${{ secrets.TC_SECRET_KEY }}
+          envId: ${{ secrets.CLOUDBASE_ENV_ID }}
+
+  deploy-prod:
+    if: startsWith(github.ref, 'refs/tags/api-prod-v')
+    runs-on: ubuntu-latest
+    environment: production
+
+    env:
+      ENV_ID: ${{ secrets.CLOUDBASE_ENV_ID }}
+      CLOUDBASE_SERVICE_NAME: dating-app-api
+      NODE_ENV: production
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      DATABASE_URL: ${{ secrets.API_PROD_DATABASE_URL }}
+      CORS_ENABLED: ${{ secrets.CORS_ENABLED }}
+      ALLOWED_ORIGINS: ${{ secrets.ALLOWED_ORIGINS }}
+      UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+      UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
+      CLOUDBASE_STORAGE_URL: ${{ secrets.CLOUDBASE_STORAGE_URL }}
+      TENCENT_IM_SDK_APP_ID: ${{ secrets.TENCENT_IM_SDK_APP_ID }}
+      TENCENT_IM_SECRET: ${{ secrets.TENCENT_IM_SECRET }}
+      JPUSH_APP_KEY: ${{ secrets.JPUSH_APP_KEY }}
+      JPUSH_MASTER_SECRET: ${{ secrets.JPUSH_MASTER_SECRET }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: ./dating_app_api
+
+      - name: Prisma generate
+        run: pnpm prisma generate
+        working-directory: ./dating_app_api
+
+      - name: Prisma migrate deploy
+        run: pnpm prisma migrate deploy
+        working-directory: ./dating_app_api
+
+      - name: Deploy production to CloudBase
+        uses: TencentCloudBase/cloudbase-action@v2.0.1
+        with:
+          secretId: ${{ secrets.TC_SECRET_ID }}
+          secretKey: ${{ secrets.TC_SECRET_KEY }}
+          envId: ${{ secrets.CLOUDBASE_ENV_ID }}

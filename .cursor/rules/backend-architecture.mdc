@@ -1,0 +1,18 @@
+---
+description: 后端分层架构（Route/Controller/Service/Repository）
+globs: dating_app_api/src/routes/**/*.ts,dating_app_api/src/controllers/**/*.ts,dating_app_api/src/services/**/*.ts,dating_app_api/src/repositories/**/*.ts
+alwaysApply: false
+---
+
+# 后端分层架构（强制）
+
+## 单向依赖（禁止跨层）
+
+- Route → Controller → Service → Repository → Model/Prisma
+
+## 职责边界（强制）
+
+- Route：只做路由映射/调用 Controller/返回统一响应；**禁止业务逻辑**
+- Controller：参数校验（Zod）+ 调用 Service；**禁止直接操作数据库**
+- Service：业务规则 + 编排外部服务；**禁止返回敏感字段**
+- Repository：只做 Prisma 数据访问；**禁止业务逻辑**、**禁止裸 SQL**

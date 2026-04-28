@@ -1,0 +1,45 @@
+{
+  "editor.tabSize": 2,
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": { 
+    "source.fixAll": true,
+    "source.organizeImports": true
+  },
+  "files.exclude": { 
+    "**/node_modules": true, 
+    "**/dist": true,
+    "**/.dart_tool": true,
+    "**/build": true,
+    "**/.pub-cache": true,
+    "**/.idea": true,
+    "**/.fvm": true
+  },
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "[dart]": {
+    "editor.formatOnSave": true,
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "editor.fontSize": 14,
+  "editor.fontFamily": "'Fira Code', monospace",
+  "editor.insertSpaces": true,
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 1000,
+  "assistant.autoApplyChanges": false,
+  "assistant.enableContext": true,
+  "assistant.contextDepth": 5,
+  "skills.enabled": [
+    "flutter-dev-specs",
+    "express-backend-specs",
+    "code-reviewer",
+    "app-compliance-deploy",
+    "git-commit",
+    "feature-developer",
+    "bug-fixer",
+    "tech-lead",
+    "qa-engineer"
+  ]
+}

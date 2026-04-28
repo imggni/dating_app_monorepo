@@ -1,0 +1,74 @@
+# 根目录 .gitignore
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+
+# Logs / temp
+*.log
+*.tmp
+*.swp
+*.swo
+
+# 前端
+dating_app/.dart_tool/
+dating_app/build/
+dating_app/.flutter-plugins
+dating_app/.flutter-plugins-dependencies
+dating_app/.pub-cache/
+dating_app/.packages
+dating_app/pubspec.lock
+
+# Flutter / Android
+dating_app/android/.gradle/
+dating_app/android/local.properties
+dating_app/android/**/GeneratedPluginRegistrant.java
+
+# Flutter / iOS
+dating_app/ios/Pods/
+dating_app/ios/.symlinks/
+dating_app/ios/Flutter/ephemeral/
+dating_app/ios/Flutter/App.framework/
+dating_app/ios/Flutter/Flutter.framework/
+dating_app/ios/Flutter/Flutter.podspec
+dating_app/ios/Flutter/Generated.xcconfig
+dating_app/ios/Flutter/flutter_export_environment.sh
+dating_app/ios/Flutter/.last_build_id
+dating_app/ios/Runner/GeneratedPluginRegistrant.*
+
+# Flutter / macOS
+dating_app/macos/Flutter/ephemeral/
+dating_app/macos/Flutter/GeneratedPluginRegistrant.swift
+dating_app/macos/Flutter/Flutter-Generated.xcconfig
+
+# Flutter / Windows
+dating_app/windows/flutter/ephemeral/
+dating_app/windows/flutter/generated_plugin_registrant.*
+
+# Flutter / Linux
+dating_app/linux/flutter/ephemeral/
+dating_app/linux/flutter/generated_plugin_registrant.*
+
+# 后端
+dating_app_api/node_modules/
+dating_app_api/.env
+
+# Backend build & test artifacts
+dating_app_api/dist/
+dating_app_api/build/
+dating_app_api/coverage/
+dating_app_api/.nyc_output/
+dating_app_api/*.log
+
+# Prisma
+dating_app_api/prisma/.env
+
+# Editor / IDE
+.vscode/
+.idea/
+*.iml
+
+# Debug artifacts
+*.orig
+*.rej

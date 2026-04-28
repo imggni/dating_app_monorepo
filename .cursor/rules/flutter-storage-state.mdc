@@ -1,0 +1,18 @@
+---
+description: Flutter 状态管理与本地存储（GetX/Hive/secure storage）
+globs: dating_app/lib/controllers/**/*.dart,dating_app/lib/services/**/*.dart,dating_app/lib/utils/**/*.dart,dating_app/lib/models/**/*.dart
+alwaysApply: false
+---
+
+# Flutter 状态与存储规范
+
+## 状态管理（GetX）
+
+- 状态放 Controller：`Rx/Rxn/<T>[].obs`；View 用 `Obx` 监听
+- 登出必须清理：secure storage + Hive（避免脏数据）
+
+## 存储分层（强制）
+
+- **敏感数据**（Token/密码等）：`flutter_secure_storage`
+- **常规数据**：Hive（通过 `StorageService` 统一封装）
+- **禁止**把敏感数据存进 Hive

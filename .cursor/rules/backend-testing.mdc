@@ -1,0 +1,17 @@
+---
+description: 后端测试规范（unit/integration/coverage）
+globs: dating_app_api/**/*.test.ts,dating_app_api/**/*.spec.ts,dating_app_api/test/**
+alwaysApply: false
+---
+
+# 后端测试规范
+
+## 结构与范围
+
+- unit：service/repository/utils
+- integration：routes（supertest）
+
+## 关键要求
+
+- Service 覆盖率 ≥ 80%；Repository 覆盖率 ≥ 70%；整体 ≥ 60%
+- 外部服务要 mock；异常路径必须覆盖

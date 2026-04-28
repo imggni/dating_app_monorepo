@@ -1,0 +1,226 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// 配置腾讯云CloudBase自带MySQL 8.0数据库连接
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL") // 环境变量配置，部署时在CloudBase设置
+  // 适配MySQL 8.0特性，开启严格模式，确保数据一致性
+  relationMode = "prisma"
+}
+
+// 1. 用户核心表（User）- 存储用户基础信息，关联所有核心场景
+model User {
+  id              String    @id @default(uuid()) // 唯一用户ID，适配前端用户标识
+  phone           String    @unique // 手机号，用户登录唯一凭证（合规要求）
+  password        String    // 加密存储密码（bcrypt加密，配合前端flutter_secure_storage）
+  nickname        String    // 用户昵称
+  avatar          String?   // 头像URL（存储在腾讯云COS/CloudBase Storage）
+  gender          String?   // 性别（male/female/other）
+  age             Int?      // 年龄
+  bio             String?   // 个人简介
+  tags            Json?     // 兴趣标签（适配同好匹配、圈子筛选），MySQL中建议用Json
+  isAnonymous     Boolean   @default(false) // 是否开启匿名模式（适配慢社交）
+  onlineStatus    Boolean   @default(false) // 在线状态（缓存至Upstash Redis）
+  gameScore       Int       @default(0) // 你画我猜游戏积分
+  createdAt       DateTime  @default(now()) // 创建时间
+  updatedAt       DateTime  @updatedAt // 更新时间
+  deletedAt       DateTime? // 软删除时间（合规要求，支持账号注销后数据保留）
+
+  // 关联关系
+  slowChatsSent   SlowChat[] @relation("SenderSlowChat") // 发送的慢消息
+  slowChatsReceived SlowChat[] @relation("ReceiverSlowChat") // 接收的慢消息
+  circlePosts     CirclePost[] // 发布的圈子帖子
+  circleComments  CircleComment[] // 发布的圈子评论
+  gameRoomsJoined GameRoomMember[] // 加入的游戏房间
+  friendRelations FriendRelation[] @relation("UserFriend")
+  friendOf        FriendRelation[] @relation("FriendOfUser")
+  imMessages      ImMessage[] // 发送的IM消息
+  GameRoom        GameRoom[]
+}
+
+// 2. 好友关系表（FriendRelation）- 适配IM好友功能
+model FriendRelation {
+  id              String   @id @default(uuid())
+  userId          String   // 发起好友请求的用户ID
+  friendId        String   // 接收好友请求的用户ID
+  status          String   @default("pending") // 好友状态（pending/accepted/rejected）
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // 关联用户表
+  user            User     @relation("UserFriend", fields: [userId], references: [id], onDelete: Cascade)
+  friend          User     @relation("FriendOfUser", fields: [friendId], references: [id], onDelete: Cascade)
+
+  // 联合唯一索引，避免重复好友关系
+  @@unique([userId, friendId])
+  @@index([userId])
+  @@index([friendId])
+}
+
+// 3. IM消息表（ImMessage）- 适配腾讯IM SDK消息存储，同步前端消息状态
+model ImMessage {
+  id              String    @id @default(uuid())
+  senderId        String    // 发送者ID（关联User表）
+  receiverId      String    // 接收者ID（关联User表，单聊）
+  groupId         String?   // 群聊ID（可选，适配群聊场景）
+  messageType     String    // 消息类型（text/image/voice/custom）
+  content         String    // 消息内容（文字消息直接存，图片/语音存URL，自定义消息存JSON）
+  isRead          Boolean   @default(false) // 已读状态（适配前端已读回执）
+  isRecalled      Boolean   @default(false) // 撤回状态（适配前端消息撤回）
+  sendTime        DateTime  @default(now()) // 发送时间
+  deletedAt       DateTime? // 软删除时间
+
+  // 关联发送者
+  sender          User      @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  // 索引优化，提升IM消息查询效率（高频场景）
+  @@index([senderId, receiverId, sendTime])
+  @@index([groupId, sendTime])
+}
+
+// 即时消息群组表（ImGroup）
+model ImGroup {
+  id        String   @id @default(uuid())
+  name      String
+  ownerId   String
+  memberCount Int    @default(0)
+  createdAt DateTime @default(now())
+
+  owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  members   ImGroupMember[]
+
+  @@index([ownerId])
+}
+
+model ImGroupMember {
+  id      String @id @default(uuid())
+  groupId String
+  userId  String
+  role    String @default("member")
+  joinedAt DateTime @default(now())
+
+  group   ImGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, userId])
+  @@index([userId])
+}
+
+// 4. 慢社交消息表（SlowChat）- 适配慢社交场景，支持延迟发送
+model SlowChat {
+  id              String    @id @default(uuid())
+  senderId        String    // 发送者ID
+  receiverId      String    // 接收者ID
+  content         String    // 消息内容（文字/语音URL）
+  messageType     String    // 消息类型（text/voice）
+  delayTime       Int       // 延迟时间（单位：分钟，适配慢社交延迟发送）
+  sendTime        DateTime  @default(now()) // 发起发送时间
+  actualSendTime  DateTime? // 实际发送时间（延迟结束后更新）
+  isOpened        Boolean   @default(false) // 是否已开封（适配信件未开封状态）
+  isAnonymous     Boolean   @default(false) // 是否匿名发送
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // 关联发送者和接收者
+  sender          User      @relation("SenderSlowChat", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver        User      @relation("ReceiverSlowChat", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  // 索引优化，提升慢消息查询效率
+  @@index([senderId, receiverId])
+  @@index([receiverId, isOpened])
+}
+
+// 5. 你画我猜游戏房间表（GameRoom）- 管理游戏房间状态
+model GameRoom {
+  id              String    @id @default(uuid())
+  roomName        String    // 房间名称
+  roomCode        String    @unique // 房间编码（前端加入房间时使用）
+  status          String    @default("waiting") // 房间状态（waiting/playing/ended）
+  hostId          String    // 房主ID（关联User表）
+  maxPlayers      Int       @default(4) // 最大玩家数
+  currentPlayers  Int       @default(1) // 当前玩家数
+  gameRound       Int       @default(1) // 当前回合数
+  roundTime       Int       @default(60) // 每回合时间（单位：秒）
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  endedAt         DateTime? // 房间结束时间
+
+  // 关联房主
+  host            User      @relation(fields: [hostId], references: [id], onDelete: Cascade)
+  // 关联房间内玩家
+  members         GameRoomMember[]
+  // 关联房间内游戏记录
+  gameRecords     GameRecord[]
+
+  // 索引优化，提升房间查询效率
+  @@index([roomCode])
+  @@index([status, currentPlayers])
+  @@index([hostId])
+}
+
+// 6. 游戏房间成员表（GameRoomMember）- 关联房间与玩家
+model GameRoomMember {
+  id              String    @id @default(uuid())
+  roomId          String    // 房间ID（关联GameRoom表）
+  userId          String    // 玩家ID（关联User表）
+  role            String    @default("player") // 角色（host/player）
+  score           Int       @default(0) // 该房间内玩家积分
+  joinTime        DateTime  @default(now()) // 加入房间时间
+
+  // 关联房间和玩家
+  room            GameRoom  @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // 联合唯一索引，避免同一玩家重复加入同一房间
+  @@unique([roomId, userId])
+  @@index([userId])
+}
+
+// 7. 游戏记录/画板同步表（GameRecord）- 存储你画我猜游戏过程与笔触数据
+model GameRecord {
+  id              String    @id @default(uuid())
+  roomId          String    // 房间ID
+  round           Int       // 回合数
+  drawerId        String    // 画画玩家ID
+  content         Json      // 笔触数据或游戏状态
+  createdAt       DateTime  @default(now())
+
+  room            GameRoom  @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  @@index([roomId, round])
+}
+
+// 8. 圈子帖子表（CirclePost）
+model CirclePost {
+  id              String    @id @default(uuid())
+  authorId        String
+  content         String
+  images          Json?     // 图片URL数组
+  tags            Json?     // 帖子标签
+  likeCount       Int       @default(0)
+  commentCount    Int       @default(0)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  author          User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  comments        CircleComment[]
+  @@index([authorId])
+}
+
+// 9. 圈子评论表（CircleComment）
+model CircleComment {
+  id              String    @id @default(uuid())
+  postId          String
+  authorId        String
+  content         String
+  createdAt       DateTime  @default(now())
+
+  post            CirclePost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author          User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  @@index([postId])
+  @@index([authorId])
+}
