@@ -44,16 +44,48 @@ jobs:
         with:
           version: 9
 
+      - name: 校验关键 secrets 是否已配置
+        shell: bash
+        env:
+          TC_SECRET_ID: ${{ secrets.TC_SECRET_ID }}
+          TC_SECRET_KEY: ${{ secrets.TC_SECRET_KEY }}
+          CLOUDBASE_ENV_ID: ${{ secrets.CLOUDBASE_ENV_ID }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          API_TEST_DATABASE_URL: ${{ secrets.API_TEST_DATABASE_URL }}
+        run: |
+          missing=()
+          [[ -z "${TC_SECRET_ID:-}" ]] && missing+=("TC_SECRET_ID")
+          [[ -z "${TC_SECRET_KEY:-}" ]] && missing+=("TC_SECRET_KEY")
+          [[ -z "${CLOUDBASE_ENV_ID:-}" ]] && missing+=("CLOUDBASE_ENV_ID")
+          [[ -z "${JWT_SECRET:-}" ]] && missing+=("JWT_SECRET")
+          [[ -z "${API_TEST_DATABASE_URL:-}" ]] && missing+=("API_TEST_DATABASE_URL")
+
+          if (( ${#missing[@]} > 0 )); then
+            echo "::error::以下 secrets 未配置或为空：${missing[*]}。请在仓库/环境的 Secrets 中补齐后重试。"
+            exit 1
+          fi
+
+      - name: Get pnpm store directory
+        run: echo "PNPM_STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_ENV"
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.PNPM_STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('dating_app_api/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --prod=false
+        run: pnpm install --frozen-lockfile
         working-directory: ./dating_app_api
 
       - name: Prisma generate
-        run: pnpm exec prisma generate
+        run: pnpm prisma generate
         working-directory: ./dating_app_api
 
       - name: Prisma migrate deploy
-        run: pnpm exec prisma migrate deploy
+        run: pnpm prisma migrate deploy
         working-directory: ./dating_app_api
 
       - name: Deploy test to CloudBase
@@ -96,6 +128,38 @@ jobs:
         uses: pnpm/action-setup@v5
         with:
           version: 9
+
+      - name: 校验关键 secrets 是否已配置
+        shell: bash
+        env:
+          TC_SECRET_ID: ${{ secrets.TC_SECRET_ID }}
+          TC_SECRET_KEY: ${{ secrets.TC_SECRET_KEY }}
+          CLOUDBASE_ENV_ID: ${{ secrets.CLOUDBASE_ENV_ID }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          API_PROD_DATABASE_URL: ${{ secrets.API_PROD_DATABASE_URL }}
+        run: |
+          missing=()
+          [[ -z "${TC_SECRET_ID:-}" ]] && missing+=("TC_SECRET_ID")
+          [[ -z "${TC_SECRET_KEY:-}" ]] && missing+=("TC_SECRET_KEY")
+          [[ -z "${CLOUDBASE_ENV_ID:-}" ]] && missing+=("CLOUDBASE_ENV_ID")
+          [[ -z "${JWT_SECRET:-}" ]] && missing+=("JWT_SECRET")
+          [[ -z "${API_PROD_DATABASE_URL:-}" ]] && missing+=("API_PROD_DATABASE_URL")
+
+          if (( ${#missing[@]} > 0 )); then
+            echo "::error::以下 secrets 未配置或为空：${missing[*]}。请在仓库/环境的 Secrets 中补齐后重试。"
+            exit 1
+          fi
+
+      - name: Get pnpm store directory
+        run: echo "PNPM_STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_ENV"
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.PNPM_STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('dating_app_api/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
