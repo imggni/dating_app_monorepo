@@ -45,15 +45,15 @@ jobs:
           version: 9
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --prod=false
         working-directory: ./dating_app_api
 
       - name: Prisma generate
-        run: pnpm prisma generate
+        run: pnpm exec prisma generate
         working-directory: ./dating_app_api
 
       - name: Prisma migrate deploy
-        run: pnpm prisma migrate deploy
+        run: pnpm exec prisma migrate deploy
         working-directory: ./dating_app_api
 
       - name: Deploy test to CloudBase
@@ -98,15 +98,15 @@ jobs:
           version: 9
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --prod=false
         working-directory: ./dating_app_api
 
       - name: Prisma generate
-        run: pnpm prisma generate
+        run: pnpm exec prisma generate
         working-directory: ./dating_app_api
 
       - name: Prisma migrate deploy
-        run: pnpm prisma migrate deploy
+        run: pnpm exec prisma migrate deploy
         working-directory: ./dating_app_api
 
       - name: Deploy production to CloudBase
