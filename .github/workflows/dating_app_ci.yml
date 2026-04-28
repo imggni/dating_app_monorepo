@@ -16,11 +16,9 @@ jobs:
     defaults:
       run:
         working-directory: dating_app
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -31,6 +29,16 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
+
+      - name: Create CI env file
+        run: |
+          if [ ! -f .env ]; then
+            cat > .env <<'EOF'
+            BASE_URL=
+            IM_SDK_APP_ID=
+            APP_NAME=
+            EOF
+          fi
 
       - name: Format check
         run: dart format --output=none --set-exit-if-changed .
