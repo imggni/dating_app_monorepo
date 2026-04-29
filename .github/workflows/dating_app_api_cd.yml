@@ -44,41 +44,6 @@ jobs:
         with:
           version: 9
 
-      - name: 校验关键 secrets 是否已配置
-        shell: bash
-        env:
-          TC_SECRET_ID: ${{ secrets.TC_SECRET_ID }}
-          TC_SECRET_KEY: ${{ secrets.TC_SECRET_KEY }}
-          CLOUDBASE_ENV_ID: ${{ secrets.CLOUDBASE_ENV_ID }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          API_TEST_DATABASE_URL: ${{ secrets.API_TEST_DATABASE_URL }}
-          UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
-          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
-          CLOUDBASE_STORAGE_URL: ${{ secrets.CLOUDBASE_STORAGE_URL }}
-          TENCENT_IM_SDK_APP_ID: ${{ secrets.TENCENT_IM_SDK_APP_ID }}
-          TENCENT_IM_SECRET: ${{ secrets.TENCENT_IM_SECRET }}
-          JPUSH_APP_KEY: ${{ secrets.JPUSH_APP_KEY }}
-          JPUSH_MASTER_SECRET: ${{ secrets.JPUSH_MASTER_SECRET }}
-        run: |
-          missing=()
-          [[ -z "${TC_SECRET_ID:-}" ]] && missing+=("TC_SECRET_ID")
-          [[ -z "${TC_SECRET_KEY:-}" ]] && missing+=("TC_SECRET_KEY")
-          [[ -z "${CLOUDBASE_ENV_ID:-}" ]] && missing+=("CLOUDBASE_ENV_ID")
-          [[ -z "${JWT_SECRET:-}" ]] && missing+=("JWT_SECRET")
-          [[ -z "${API_TEST_DATABASE_URL:-}" ]] && missing+=("API_TEST_DATABASE_URL")
-          [[ -z "${UPSTASH_REDIS_REST_URL:-}" ]] && missing+=("UPSTASH_REDIS_REST_URL")
-          [[ -z "${UPSTASH_REDIS_REST_TOKEN:-}" ]] && missing+=("UPSTASH_REDIS_REST_TOKEN")
-          [[ -z "${CLOUDBASE_STORAGE_URL:-}" ]] && missing+=("CLOUDBASE_STORAGE_URL")
-          [[ -z "${TENCENT_IM_SDK_APP_ID:-}" ]] && missing+=("TENCENT_IM_SDK_APP_ID")
-          [[ -z "${TENCENT_IM_SECRET:-}" ]] && missing+=("TENCENT_IM_SECRET")
-          [[ -z "${JPUSH_APP_KEY:-}" ]] && missing+=("JPUSH_APP_KEY")
-          [[ -z "${JPUSH_MASTER_SECRET:-}" ]] && missing+=("JPUSH_MASTER_SECRET")
-
-          if (( ${#missing[@]} > 0 )); then
-            echo "::error::以下 secrets 未配置或为空：${missing[*]}。请在仓库 Secrets 中补齐后重试。"
-            exit 1
-          fi
-
       - name: Install dependencies
         working-directory: dating_app_api
         env:
@@ -155,42 +120,7 @@ jobs:
         uses: pnpm/action-setup@v5
         with:
           version: 9
-
-      - name: 校验关键 secrets 是否已配置
-        shell: bash
-        env:
-          TC_SECRET_ID: ${{ secrets.TC_SECRET_ID }}
-          TC_SECRET_KEY: ${{ secrets.TC_SECRET_KEY }}
-          CLOUDBASE_ENV_ID: ${{ secrets.CLOUDBASE_ENV_ID }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          API_PROD_DATABASE_URL: ${{ secrets.API_PROD_DATABASE_URL }}
-          UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
-          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
-          CLOUDBASE_STORAGE_URL: ${{ secrets.CLOUDBASE_STORAGE_URL }}
-          TENCENT_IM_SDK_APP_ID: ${{ secrets.TENCENT_IM_SDK_APP_ID }}
-          TENCENT_IM_SECRET: ${{ secrets.TENCENT_IM_SECRET }}
-          JPUSH_APP_KEY: ${{ secrets.JPUSH_APP_KEY }}
-          JPUSH_MASTER_SECRET: ${{ secrets.JPUSH_MASTER_SECRET }}
-        run: |
-          missing=()
-          [[ -z "${TC_SECRET_ID:-}" ]] && missing+=("TC_SECRET_ID")
-          [[ -z "${TC_SECRET_KEY:-}" ]] && missing+=("TC_SECRET_KEY")
-          [[ -z "${CLOUDBASE_ENV_ID:-}" ]] && missing+=("CLOUDBASE_ENV_ID")
-          [[ -z "${JWT_SECRET:-}" ]] && missing+=("JWT_SECRET")
-          [[ -z "${API_PROD_DATABASE_URL:-}" ]] && missing+=("API_PROD_DATABASE_URL")
-          [[ -z "${UPSTASH_REDIS_REST_URL:-}" ]] && missing+=("UPSTASH_REDIS_REST_URL")
-          [[ -z "${UPSTASH_REDIS_REST_TOKEN:-}" ]] && missing+=("UPSTASH_REDIS_REST_TOKEN")
-          [[ -z "${CLOUDBASE_STORAGE_URL:-}" ]] && missing+=("CLOUDBASE_STORAGE_URL")
-          [[ -z "${TENCENT_IM_SDK_APP_ID:-}" ]] && missing+=("TENCENT_IM_SDK_APP_ID")
-          [[ -z "${TENCENT_IM_SECRET:-}" ]] && missing+=("TENCENT_IM_SECRET")
-          [[ -z "${JPUSH_APP_KEY:-}" ]] && missing+=("JPUSH_APP_KEY")
-          [[ -z "${JPUSH_MASTER_SECRET:-}" ]] && missing+=("JPUSH_MASTER_SECRET")
-
-          if (( ${#missing[@]} > 0 )); then
-            echo "::error::以下 secrets 未配置或为空：${missing[*]}。请在仓库 Secrets 中补齐后重试。"
-            exit 1
-          fi
-
+          
       - name: Install dependencies
         working-directory: dating_app_api
         env:
