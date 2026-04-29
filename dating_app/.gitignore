@@ -34,7 +34,6 @@ migrate_working_dir/
 /build/
 
 # Environment files
-.env
 .env.local
 .env.*.local
 

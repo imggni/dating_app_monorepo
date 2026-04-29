@@ -37,10 +37,8 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Create test env file
-        env:
-          APP_BASE_URL: ${{ secrets.APP_TEST_BASE_URL }}
-        run: if [ -z "$APP_BASE_URL" ]; then echo "APP_TEST_BASE_URL 未配置"; exit 1; fi; printf 'BASE_URL=%s\n' "$APP_BASE_URL" > .env
+      - name: Prepare test env file
+        run: cp .env.test .env
 
       - name: Build test Android APK
         run: flutter build apk --release --flavor test
@@ -85,10 +83,8 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Create production env file
-        env:
-          APP_BASE_URL: ${{ secrets.APP_PROD_BASE_URL }}
-        run: if [ -z "$APP_BASE_URL" ]; then echo "APP_PROD_BASE_URL 未配置"; exit 1; fi; printf 'BASE_URL=%s\n' "$APP_BASE_URL" > .env
+      - name: Prepare production env file
+        run: cp .env.production .env
 
       - name: Build production Android APK
         run: flutter build apk --release --flavor prod

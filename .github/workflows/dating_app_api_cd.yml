@@ -15,14 +15,15 @@ jobs:
     runs-on: ubuntu-latest
     environment: test
 
+    # cloudbaserc.json interpolates {{env.*}} at deploy time; mirror Tencent CloudBase keys and naming from .env.example.
     env:
       ENV_ID: ${{ secrets.CLOUDBASE_ENV_ID }}
       CLOUDBASE_SERVICE_NAME: dating-app-api-test
       NODE_ENV: production
+      CORS_ENABLED: "true"
+      ALLOWED_ORIGINS: "*"
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       DATABASE_URL: ${{ secrets.API_TEST_DATABASE_URL }}
-      CORS_ENABLED: ${{ secrets.CORS_ENABLED }}
-      ALLOWED_ORIGINS: ${{ secrets.ALLOWED_ORIGINS }}
       UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
       UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
       CLOUDBASE_STORAGE_URL: ${{ secrets.CLOUDBASE_STORAGE_URL }}
@@ -52,6 +53,13 @@ jobs:
           CLOUDBASE_ENV_ID: ${{ secrets.CLOUDBASE_ENV_ID }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           API_TEST_DATABASE_URL: ${{ secrets.API_TEST_DATABASE_URL }}
+          UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
+          CLOUDBASE_STORAGE_URL: ${{ secrets.CLOUDBASE_STORAGE_URL }}
+          TENCENT_IM_SDK_APP_ID: ${{ secrets.TENCENT_IM_SDK_APP_ID }}
+          TENCENT_IM_SECRET: ${{ secrets.TENCENT_IM_SECRET }}
+          JPUSH_APP_KEY: ${{ secrets.JPUSH_APP_KEY }}
+          JPUSH_MASTER_SECRET: ${{ secrets.JPUSH_MASTER_SECRET }}
         run: |
           missing=()
           [[ -z "${TC_SECRET_ID:-}" ]] && missing+=("TC_SECRET_ID")
@@ -59,9 +67,16 @@ jobs:
           [[ -z "${CLOUDBASE_ENV_ID:-}" ]] && missing+=("CLOUDBASE_ENV_ID")
           [[ -z "${JWT_SECRET:-}" ]] && missing+=("JWT_SECRET")
           [[ -z "${API_TEST_DATABASE_URL:-}" ]] && missing+=("API_TEST_DATABASE_URL")
+          [[ -z "${UPSTASH_REDIS_REST_URL:-}" ]] && missing+=("UPSTASH_REDIS_REST_URL")
+          [[ -z "${UPSTASH_REDIS_REST_TOKEN:-}" ]] && missing+=("UPSTASH_REDIS_REST_TOKEN")
+          [[ -z "${CLOUDBASE_STORAGE_URL:-}" ]] && missing+=("CLOUDBASE_STORAGE_URL")
+          [[ -z "${TENCENT_IM_SDK_APP_ID:-}" ]] && missing+=("TENCENT_IM_SDK_APP_ID")
+          [[ -z "${TENCENT_IM_SECRET:-}" ]] && missing+=("TENCENT_IM_SECRET")
+          [[ -z "${JPUSH_APP_KEY:-}" ]] && missing+=("JPUSH_APP_KEY")
+          [[ -z "${JPUSH_MASTER_SECRET:-}" ]] && missing+=("JPUSH_MASTER_SECRET")
 
           if (( ${#missing[@]} > 0 )); then
-            echo "::error::以下 secrets 未配置或为空：${missing[*]}。请在仓库/环境的 Secrets 中补齐后重试。"
+            echo "::error::以下 secrets 未配置或为空：${missing[*]}。请在仓库 Secrets 中补齐（与腾讯云 CloudBase 服务环境变量及 cloudbaserc.json 中的 {{env.*}} 一致）后重试。"
             exit 1
           fi
 
@@ -104,10 +119,10 @@ jobs:
       ENV_ID: ${{ secrets.CLOUDBASE_ENV_ID }}
       CLOUDBASE_SERVICE_NAME: dating-app-api
       NODE_ENV: production
+      CORS_ENABLED: "true"
+      ALLOWED_ORIGINS: "*"
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       DATABASE_URL: ${{ secrets.API_PROD_DATABASE_URL }}
-      CORS_ENABLED: ${{ secrets.CORS_ENABLED }}
-      ALLOWED_ORIGINS: ${{ secrets.ALLOWED_ORIGINS }}
       UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
       UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
       CLOUDBASE_STORAGE_URL: ${{ secrets.CLOUDBASE_STORAGE_URL }}
@@ -137,6 +152,13 @@ jobs:
           CLOUDBASE_ENV_ID: ${{ secrets.CLOUDBASE_ENV_ID }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           API_PROD_DATABASE_URL: ${{ secrets.API_PROD_DATABASE_URL }}
+          UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
+          CLOUDBASE_STORAGE_URL: ${{ secrets.CLOUDBASE_STORAGE_URL }}
+          TENCENT_IM_SDK_APP_ID: ${{ secrets.TENCENT_IM_SDK_APP_ID }}
+          TENCENT_IM_SECRET: ${{ secrets.TENCENT_IM_SECRET }}
+          JPUSH_APP_KEY: ${{ secrets.JPUSH_APP_KEY }}
+          JPUSH_MASTER_SECRET: ${{ secrets.JPUSH_MASTER_SECRET }}
         run: |
           missing=()
           [[ -z "${TC_SECRET_ID:-}" ]] && missing+=("TC_SECRET_ID")
@@ -144,9 +166,16 @@ jobs:
           [[ -z "${CLOUDBASE_ENV_ID:-}" ]] && missing+=("CLOUDBASE_ENV_ID")
           [[ -z "${JWT_SECRET:-}" ]] && missing+=("JWT_SECRET")
           [[ -z "${API_PROD_DATABASE_URL:-}" ]] && missing+=("API_PROD_DATABASE_URL")
+          [[ -z "${UPSTASH_REDIS_REST_URL:-}" ]] && missing+=("UPSTASH_REDIS_REST_URL")
+          [[ -z "${UPSTASH_REDIS_REST_TOKEN:-}" ]] && missing+=("UPSTASH_REDIS_REST_TOKEN")
+          [[ -z "${CLOUDBASE_STORAGE_URL:-}" ]] && missing+=("CLOUDBASE_STORAGE_URL")
+          [[ -z "${TENCENT_IM_SDK_APP_ID:-}" ]] && missing+=("TENCENT_IM_SDK_APP_ID")
+          [[ -z "${TENCENT_IM_SECRET:-}" ]] && missing+=("TENCENT_IM_SECRET")
+          [[ -z "${JPUSH_APP_KEY:-}" ]] && missing+=("JPUSH_APP_KEY")
+          [[ -z "${JPUSH_MASTER_SECRET:-}" ]] && missing+=("JPUSH_MASTER_SECRET")
 
           if (( ${#missing[@]} > 0 )); then
-            echo "::error::以下 secrets 未配置或为空：${missing[*]}。请在仓库/环境的 Secrets 中补齐后重试。"
+            echo "::error::以下 secrets 未配置或为空：${missing[*]}。请在仓库 Secrets 中补齐（与腾讯云 CloudBase api-prod 环境变量及 cloudbaserc.json 中的 {{env.*}} 一致）后重试。"
             exit 1
           fi
 
