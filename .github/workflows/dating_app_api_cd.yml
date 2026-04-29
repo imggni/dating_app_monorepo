@@ -80,13 +80,10 @@ jobs:
 
       - name: Deploy to CloudBase Cloud Run
         run: |
-          tcb framework deploy \
-            --env-id ${{ secrets.CLOUDBASE_ENV_ID }} \
-            --secret-id ${{ secrets.TC_SECRET_ID }} \
-            --secret-key ${{ secrets.TC_SECRET_KEY }}
+          tcb framework deploy --env-id ${{ secrets.CLOUDBASE_ENV_ID }}
         env:
-          TCB_SECRET_ID: ${{ secrets.TC_SECRET_ID }}
-          TCB_SECRET_KEY: ${{ secrets.TC_SECRET_KEY }}
+          TENCENTCLOUD_SECRET_ID: ${{ secrets.TC_SECRET_ID }}
+          TENCENTCLOUD_SECRET_KEY: ${{ secrets.TC_SECRET_KEY }}
 
   deploy-prod:
     if: startsWith(github.ref, 'refs/tags/api-prod-v')
@@ -158,10 +155,7 @@ jobs:
 
       - name: Deploy to CloudBase Cloud Run
         run: |
-          tcb framework deploy \
-            --env-id ${{ secrets.CLOUDBASE_ENV_ID }} \
-            --secret-id ${{ secrets.TC_SECRET_ID }} \
-            --secret-key ${{ secrets.TC_SECRET_KEY }}
+          tcb framework deploy --env-id ${{ secrets.CLOUDBASE_ENV_ID }}
         env:
-          TCB_SECRET_ID: ${{ secrets.TC_SECRET_ID }}
-          TCB_SECRET_KEY: ${{ secrets.TC_SECRET_KEY }}
+          TENCENTCLOUD_SECRET_ID: ${{ secrets.TC_SECRET_ID }}
+          TENCENTCLOUD_SECRET_KEY: ${{ secrets.TC_SECRET_KEY }}
