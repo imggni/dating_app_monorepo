@@ -18,7 +18,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "5.10.2",
+    "@prisma/client": "^5.10.2",
     "@upstash/redis": "^1.37.0",
     "axios": "^1.15.2",
     "bcrypt": "^6.0.0",
@@ -32,7 +32,6 @@
     "jsonwebtoken": "^9.0.3",
     "morgan": "^1.10.1",
     "multer": "^2.1.1",
-    "prisma": "5.10.2",
     "socket.io": "^4.8.3",
     "swagger-ui-express": "^5.0.1",
     "tencentcloud-sdk-nodejs": "^4.1.221",
@@ -59,6 +58,7 @@
     "mocha": "^10.2.0",
     "nodemon": "^3.1.0",
     "prettier": "^3.6.2",
+    "prisma": "^5.10.2",
     "socket.io-client": "^4.8.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.2"

@@ -92,7 +92,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --include=dev
         working-directory: ./dating_app_api
 
       - name: Prisma generate
@@ -191,7 +191,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --include=dev
         working-directory: ./dating_app_api
 
       - name: Prisma generate
