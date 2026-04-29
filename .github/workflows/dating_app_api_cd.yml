@@ -80,6 +80,7 @@ jobs:
 
       - name: Deploy to CloudBase Cloud Run
         run: |
+          tcb login --key ${{ secrets.TC_SECRET_ID }} --secret ${{ secrets.TC_SECRET_KEY }}
           tcb framework deploy --env-id ${{ secrets.CLOUDBASE_ENV_ID }}
         env:
           TENCENTCLOUD_SECRET_ID: ${{ secrets.TC_SECRET_ID }}
@@ -155,6 +156,7 @@ jobs:
 
       - name: Deploy to CloudBase Cloud Run
         run: |
+          tcb login --key ${{ secrets.TC_SECRET_ID }} --secret ${{ secrets.TC_SECRET_KEY }}
           tcb framework deploy --env-id ${{ secrets.CLOUDBASE_ENV_ID }}
         env:
           TENCENTCLOUD_SECRET_ID: ${{ secrets.TC_SECRET_ID }}
