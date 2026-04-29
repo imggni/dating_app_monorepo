@@ -1,0 +1,9 @@
+---
+description: Git Commit 中文规则
+globs: ["**/*"]
+---
+# Git Commit Message 规范
+- 所有Git提交信息必须使用简体中文
+- 格式严格遵循：[类型]: 简短的中文描述
+- 类型可选：feat(新增功能)、fix(修复bug)、chore(构建/工具/CI调整)、docs(文档修改)、refactor(重构)
+- 示例：chore: 更新CloudBase CLI安装脚本并调整CI工作流配置
