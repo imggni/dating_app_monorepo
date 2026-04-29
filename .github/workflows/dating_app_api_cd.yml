@@ -79,6 +79,18 @@ jobs:
             exit 1
           fi
 
+      - name: Install dependencies
+        working-directory: dating_app_api
+        env:
+          NODE_ENV: development
+        run: pnpm install --frozen-lockfile
+
+      - name: Prisma generate
+        working-directory: dating_app_api
+        env:
+          NODE_ENV: development
+        run: pnpm prisma generate
+
       - name: Create .env file for CloudBase
         run: |
           cat << EOF > .env
@@ -178,6 +190,18 @@ jobs:
             echo "::error::以下 secrets 未配置或为空：${missing[*]}。请在仓库 Secrets 中补齐后重试。"
             exit 1
           fi
+
+      - name: Install dependencies
+        working-directory: dating_app_api
+        env:
+          NODE_ENV: development
+        run: pnpm install --frozen-lockfile
+
+      - name: Prisma generate
+        working-directory: dating_app_api
+        env:
+          NODE_ENV: development
+        run: pnpm prisma generate
 
       - name: Create .env file for CloudBase
         run: |
