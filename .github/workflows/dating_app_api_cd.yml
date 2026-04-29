@@ -79,12 +79,10 @@ jobs:
         run: npm install -g @cloudbase/cli
 
       - name: Deploy to CloudBase Cloud Run
-        run: |
-          tcb login --key ${{ secrets.TC_SECRET_ID }} --secret ${{ secrets.TC_SECRET_KEY }}
-          tcb framework deploy --env-id ${{ secrets.CLOUDBASE_ENV_ID }}
+        run: tcb framework deploy --env-id ${{ secrets.CLOUDBASE_ENV_ID }}
         env:
-          TENCENTCLOUD_SECRET_ID: ${{ secrets.TC_SECRET_ID }}
-          TENCENTCLOUD_SECRET_KEY: ${{ secrets.TC_SECRET_KEY }}
+          CLOUDBASE_SECRET_ID: ${{ secrets.TC_SECRET_ID }}
+          CLOUDBASE_SECRET_KEY: ${{ secrets.TC_SECRET_KEY }}
 
   deploy-prod:
     if: startsWith(github.ref, 'refs/tags/api-prod-v')
@@ -155,9 +153,7 @@ jobs:
         run: npm install -g @cloudbase/cli
 
       - name: Deploy to CloudBase Cloud Run
-        run: |
-          tcb login --key ${{ secrets.TC_SECRET_ID }} --secret ${{ secrets.TC_SECRET_KEY }}
-          tcb framework deploy --env-id ${{ secrets.CLOUDBASE_ENV_ID }}
+        run: tcb framework deploy --env-id ${{ secrets.CLOUDBASE_ENV_ID }}
         env:
-          TENCENTCLOUD_SECRET_ID: ${{ secrets.TC_SECRET_ID }}
-          TENCENTCLOUD_SECRET_KEY: ${{ secrets.TC_SECRET_KEY }}
+          CLOUDBASE_SECRET_ID: ${{ secrets.TC_SECRET_ID }}
+          CLOUDBASE_SECRET_KEY: ${{ secrets.TC_SECRET_KEY }}
