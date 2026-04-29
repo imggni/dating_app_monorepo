@@ -19,7 +19,8 @@ jobs:
 
     env:
       NODE_ENV: test
-      DATABASE_URL: ${{ secrets.API_TEST_DATABASE_URL }}
+      # Prisma tooling requires a valid URL string; fork PRs cannot read repo secrets.
+      DATABASE_URL: ${{ secrets.API_TEST_DATABASE_URL || 'mysql://ci_placeholder:ci_placeholder@127.0.0.1:3306/ci_placeholder' }}
       # CI-only JWT so integration tests can run without Repository secrets (not used in deploy).
       JWT_SECRET: github-actions-ci-jwt-placeholder-not-for-production
 

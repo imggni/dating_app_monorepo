@@ -18,7 +18,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^5.10.2",
+    "@prisma/client": "5.10.2",
     "@upstash/redis": "^1.37.0",
     "axios": "^1.15.2",
     "bcrypt": "^6.0.0",
