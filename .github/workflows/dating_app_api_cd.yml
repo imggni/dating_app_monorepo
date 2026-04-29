@@ -96,11 +96,11 @@ jobs:
         working-directory: ./dating_app_api
 
       - name: Prisma generate
-        run: npx prisma generate
+        run: pnpm exec prisma generate
         working-directory: ./dating_app_api
 
       - name: Prisma migrate deploy
-        run: npx prisma migrate deploy
+        run: pnpm exec prisma migrate deploy
         working-directory: ./dating_app_api
 
       - name: Deploy test to CloudBase
@@ -195,11 +195,11 @@ jobs:
         working-directory: ./dating_app_api
 
       - name: Prisma generate
-        run: npx prisma generate
+        run: pnpm exec prisma generate
         working-directory: ./dating_app_api
 
       - name: Prisma migrate deploy
-        run: npx prisma migrate deploy
+        run: pnpm exec prisma migrate deploy
         working-directory: ./dating_app_api
 
       - name: Deploy production to CloudBase
