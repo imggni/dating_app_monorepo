@@ -79,7 +79,8 @@ jobs:
         run: npm install -g @cloudbase/cli
 
       - name: Deploy to CloudBase Cloud Run
-        run: 
+        run:
+          npm install -g @cloudbase/framework-plugin-container
           tcb login --apiKeyId ${{ secrets.TC_SECRET_ID }} --apiKey ${{ secrets.TC_SECRET_KEY }}
           tcb framework deploy --env-id ${{ secrets.CLOUDBASE_ENV_ID }}
 
@@ -153,5 +154,6 @@ jobs:
 
       - name: Deploy to CloudBase Cloud Run
         run: |
+          npm install -g @cloudbase/framework-plugin-container
           tcb login --apiKeyId ${{ secrets.TC_SECRET_ID }} --apiKey ${{ secrets.TC_SECRET_KEY }}
           tcb framework deploy --env-id ${{ secrets.CLOUDBASE_ENV_ID }}
