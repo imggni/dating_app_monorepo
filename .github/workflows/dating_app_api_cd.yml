@@ -82,7 +82,6 @@ jobs:
         run: |
           tcb framework deploy \
             --envId ${{ secrets.CLOUDBASE_ENV_ID }} \
-            --non-interactive
         env:
           TCB_SECRET_ID: ${{ secrets.TC_SECRET_ID }}
           TCB_SECRET_KEY: ${{ secrets.TC_SECRET_KEY }}
@@ -120,7 +119,7 @@ jobs:
         uses: pnpm/action-setup@v5
         with:
           version: 9
-          
+
       - name: Install dependencies
         working-directory: dating_app_api
         env:
@@ -159,7 +158,6 @@ jobs:
         run: |
           tcb framework deploy \
             --envId ${{ secrets.CLOUDBASE_ENV_ID }} \
-            --non-interactive
         env:
           TCB_SECRET_ID: ${{ secrets.TC_SECRET_ID }}
           TCB_SECRET_KEY: ${{ secrets.TC_SECRET_KEY }}
