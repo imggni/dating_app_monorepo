@@ -92,15 +92,17 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --include=dev
+        run: pnpm install --frozen-lockfile
         working-directory: ./dating_app_api
+        env:
+          NODE_ENV: ''
 
       - name: Prisma generate
-        run: pnpm exec prisma generate
+        run: pnpm prisma generate
         working-directory: ./dating_app_api
 
       - name: Prisma migrate deploy
-        run: pnpm exec prisma migrate deploy
+        run: pnpm prisma migrate deploy
         working-directory: ./dating_app_api
 
       - name: Deploy test to CloudBase
@@ -191,15 +193,17 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --include=dev
+        run: pnpm install --frozen-lockfile
         working-directory: ./dating_app_api
+        env:
+          NODE_ENV: ''
 
       - name: Prisma generate
-        run: pnpm exec prisma generate
+        run: pnpm prisma generate
         working-directory: ./dating_app_api
 
       - name: Prisma migrate deploy
-        run: pnpm exec prisma migrate deploy
+        run: pnpm prisma migrate deploy
         working-directory: ./dating_app_api
 
       - name: Deploy production to CloudBase
