@@ -79,10 +79,9 @@ jobs:
         run: npm install -g @cloudbase/cli
 
       - name: Deploy to CloudBase Cloud Run
-        run: tcb framework deploy --env-id ${{ secrets.CLOUDBASE_ENV_ID }}
-        env:
-          CLOUDBASE_SECRET_ID: ${{ secrets.TC_SECRET_ID }}
-          CLOUDBASE_SECRET_KEY: ${{ secrets.TC_SECRET_KEY }}
+        run: 
+          tcb login --apiKeyId ${{ secrets.TC_SECRET_ID }} --apiKey ${{ secrets.TC_SECRET_KEY }}
+          tcb framework deploy --env-id ${{ secrets.CLOUDBASE_ENV_ID }}
 
   deploy-prod:
     if: startsWith(github.ref, 'refs/tags/api-prod-v')
@@ -153,7 +152,6 @@ jobs:
         run: npm install -g @cloudbase/cli
 
       - name: Deploy to CloudBase Cloud Run
-        run: tcb framework deploy --env-id ${{ secrets.CLOUDBASE_ENV_ID }}
-        env:
-          CLOUDBASE_SECRET_ID: ${{ secrets.TC_SECRET_ID }}
-          CLOUDBASE_SECRET_KEY: ${{ secrets.TC_SECRET_KEY }}
+        run: |
+          tcb login --apiKeyId ${{ secrets.TC_SECRET_ID }} --apiKey ${{ secrets.TC_SECRET_KEY }}
+          tcb framework deploy --env-id ${{ secrets.CLOUDBASE_ENV_ID }}
