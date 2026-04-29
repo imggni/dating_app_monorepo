@@ -76,7 +76,7 @@ jobs:
           EOF
 
       - name: Install CloudBase CLI
-        run: npm install -g @cloudbase/cli@1.9.10
+        run: npm install -g @cloudbase/cli@2.0.0
 
       - name: Deploy to CloudBase Cloud Run
         run:
@@ -150,7 +150,7 @@ jobs:
           EOF
 
       - name: Install CloudBase CLI
-        run:  npm install -g @cloudbase/cli@1.9.10
+        run:  npm install -g @cloudbase/cli@2.0.0
 
       - name: Deploy to CloudBase Cloud Run
         run: |
